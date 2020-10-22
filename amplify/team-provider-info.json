@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-rebalance-dev-153321-authRole",
+      "UnauthRoleArn": "arn:aws:iam::593912919435:role/amplify-rebalance-dev-153321-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::593912919435:role/amplify-rebalance-dev-153321-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-rebalance-dev-153321-deployment",
+      "UnauthRoleName": "amplify-rebalance-dev-153321-unauthRole",
+      "StackName": "amplify-rebalance-dev-153321",
+      "StackId": "arn:aws:cloudformation:us-east-2:593912919435:stack/amplify-rebalance-dev-153321/470a5750-09b6-11eb-82ee-062a8951a9ee",
+      "AmplifyAppId": "d3iwnupxu9gdlf"
+    },
+    "categories": {
+      "auth": {
+        "rebalancec4a90fa9": {}
+      }
+    }
+  }
+}

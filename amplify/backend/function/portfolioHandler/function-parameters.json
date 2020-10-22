@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "auth": {
+      "rebalancec4a90fa9": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    },
+    "storage": {
+      "dynamo": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

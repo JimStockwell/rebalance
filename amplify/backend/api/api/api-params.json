@@ -1,0 +1,64 @@
+{
+    "paths": [
+        {
+            "name": "/prices",
+            "lambdaFunction": "prices",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/GET"
+                ]
+            },
+            "policyResourceName": "/prices"
+        },
+        {
+            "name": "/portfolio",
+            "lambdaFunction": "portfolioHandler",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ]
+            }
+        }
+    ],
+    "resourceName": "api",
+    "apiName": "api",
+    "functionArns": [
+        {
+            "lambdaFunction": "prices"
+        },
+        {
+            "lambdaFunction": "portfolioHandler"
+        }
+    ],
+    "privacy": {
+        "auth": 2,
+        "unauth": 0,
+        "authRoleName": "amplify-rebalance-dev-153321-authRole",
+        "unAuthRoleName": "amplify-rebalance-dev-153321-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "prices",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "portfolioHandler",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ],
+    "uuid": "86f203ea"
+}
