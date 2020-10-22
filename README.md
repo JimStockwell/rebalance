@@ -1,6 +1,6 @@
 # Portfolio Rebalancer
 
-This project be an investment portfolio rebalancer
+This project will be an investment portfolio rebalancer
 hosted on AWS.
 
 Each user can maintain one portfolio.
