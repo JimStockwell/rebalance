@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { TableConfigurable } from './Table';
 
 test('TableConfigurable renders provided data', () => {
@@ -43,5 +43,8 @@ test('TableConfigurable renders provided data', () => {
     expectToBeInTheDocument(/Poppins/);
     expectToBeInTheDocument(/The/);
     expectToBeInTheDocument(/Blight/);
+
+    const row = screen.getByText('Mary').closest("tr");
+    expect(within(row).getByText('Poppins')).toBeInTheDocument();
   }); 
   
