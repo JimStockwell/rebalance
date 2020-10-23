@@ -51,7 +51,10 @@ test('When edit button is clicked, replace with cancel and save choices', async 
     expect(screen.queryByText("Edit")).not.toBeInTheDocument();
     expect(screen.getByText("Cancel")).toBeInTheDocument();
     expect(screen.getByText("Save")).toBeInTheDocument();
-})
+});
+
+// test('When edit button is clicked, table goes into edit mode', async () => {
+// });
 
 // TODO: Error handling, control, get and merge prices
 //       Not just hard coded, but reflects what is provided by backend.
