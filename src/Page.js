@@ -41,7 +41,7 @@ const Page = (props) => {
     if (portfolio === null) return "Loading...";
     return (
         <div>
-            <TableConfigurable data={portfolio} columns={columns}></TableConfigurable>
+            <TableConfigurable data={portfolio} columns={columns} edit={pageState === "editing"}></TableConfigurable>
             <PageStateButtons state={pageState} onNewState={setPageState} />
         </div>
     )
@@ -57,7 +57,7 @@ const PageStateButtons = props => {
             <button onClick={() => props.onNewState("editing")}>Edit</button>
         )
     }
-    if (props.state == "editing") {
+    if (props.state === "editing") {
         return (
             <div>
                 <button>Cancel</button>

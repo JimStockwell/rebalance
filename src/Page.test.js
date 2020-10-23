@@ -5,12 +5,20 @@ import { render, screen, waitForElement, waitForElementToBeRemoved, fireEvent } 
 import { Page } from './Page';
 import BackendApi from './BackendApi';
 
+// -----------------
+// Data not loaded
+// -----------------
+
 test('Page with no data source shows loading message', () => {
     render(<Page />);
 
     const el = screen.getByText(/Loading/);
     expect(el).toBeInTheDocument();
 });
+
+// ---------------------
+// Initial mode
+// ---------------------
 
 test('Page can read and display a one line portfolio', async () => {
     const backendApi = BackendApi.createNull();
@@ -37,9 +45,23 @@ test('When simply displaying the portfolio, there is an edit button (after the p
     const cancel = screen.queryByText("Cancel");
     expect(cancel).not.toBeInTheDocument();
 
+});
+
+test('When simply displaying the portfolio, the table is not in edit mode', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
+
+    render(<Page backend={backendApi} />);
+
+    const text = await waitForElement(() => screen.queryByText("Edit"));
+    expect(screen.queryByText("Add New Row")).not.toBeInTheDocument(); // "Add New Row" is an edit control from Table
 })
 
-test('When edit button is clicked, replace with cancel and save choices', async () => {
+//----------
+// Edit mode
+//----------
+
+test('In edit mode, Edit button is gone, Cancel and Save appear', async () => {
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
     render(<Page backend={backendApi} />);
@@ -53,8 +75,18 @@ test('When edit button is clicked, replace with cancel and save choices', async 
     expect(screen.getByText("Save")).toBeInTheDocument();
 });
 
-// test('When edit button is clicked, table goes into edit mode', async () => {
-// });
+test('In edit mode, the table is in edit mode too', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
+    render(<Page backend={backendApi} />);
+    const text = await waitForElement(() => screen.queryByText("Edit"));
+    const button = text.closest("button");
+
+    fireEvent.click(button);
+
+    expect(screen.getByText("Add New Row")).toBeInTheDocument(); // "Add New Row" is an edit control from Table
+});
+
 
 // TODO: Error handling, control, get and merge prices
 //       Not just hard coded, but reflects what is provided by backend.

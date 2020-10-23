@@ -1,5 +1,3 @@
-"use strict";
-
 //
 // Wrapper for backend API
 // (Includes a null version constructor)
@@ -55,7 +53,7 @@ export default class BackendApi {
 
     async signIn(username, password) {
         try {
-            const user = await this._auth.signIn(username, password);
+            await this._auth.signIn(username, password);
         } catch (error) {
             console.log('error signing in', error);
         }
