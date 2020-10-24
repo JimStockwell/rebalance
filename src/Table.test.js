@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, within, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event'
 import { TableConfigurable } from './Table';
 
 test('TableConfigurable renders provided data', () => {
@@ -31,6 +32,15 @@ test('TableConfigurable hides edit mode controls when out of edit mode', () => {
   expect(screen.queryByText('Add New Row')).not.toBeInTheDocument();
 });
 
+test('When in regular mode, cells are NOT editable', () => {
+  const { data, columns } = getDefaultTestData();
+  render(<TableConfigurable data={data} columns={columns} />)
+
+  const element = screen.queryByDisplayValue("Mary"); // not found because is regular text
+
+  expect(element).not.toBeInTheDocument
+});
+
 //------------------ Edit Mode -------------------------
 
 test('TableConfigurable displays "Add New Row" button when in edit mode', () => {
@@ -39,6 +49,15 @@ test('TableConfigurable displays "Add New Row" button when in edit mode', () => 
   render(<TableConfigurable data={data} columns={columns} edit />)
 
   expect(screen.getByText('Add New Row').closest("button")).toBeInTheDocument();
+});
+
+test('When in edit mode, cells are editable', () => {
+  const { data, columns } = getDefaultTestData();
+  render(<TableConfigurable data={data} columns={columns} edit />)
+  const element = screen.getByDisplayValue("Mary");
+
+  userEvent.type(element, "Jill")
+  expect(element).toHaveValue("Jill");
 });
 
 test('When "Add New Row" is clicked, a new blank row really is added', () => {
