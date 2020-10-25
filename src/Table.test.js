@@ -3,6 +3,8 @@ import { render, screen, within, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'
 import { TableConfigurable } from './Table';
 
+// -------------- regular mode ---------------------
+
 test('TableConfigurable renders provided data', () => {
   const { data, columns } = getDefaultTestData();
 
@@ -63,11 +65,11 @@ test('When in edit mode, cells are editable', () => {
 test('When "Add New Row" is clicked, a new blank row really is added', () => {
   const { data, columns } = getDefaultTestData();
   render(<TableConfigurable data={data} columns={columns} edit />);
-  const button = screen.getByText('Add New Row').closest("button");
+  const addNewRowButton = screen.getByText('Add New Row').closest("button");
   const rowsBeforeAdding = countOfRows(screen.getByRole("table"));
   const textBeforeAdding = screen.getByRole("table").textContent;
 
-  fireEvent.click(button);
+  fireEvent.click(addNewRowButton);
 
   expect(countOfRows(screen.getByRole("table"))).toBe(rowsBeforeAdding + 1);
   expect(screen.getByRole("table").textContent).toBe(textBeforeAdding);
