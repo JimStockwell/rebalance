@@ -62,14 +62,17 @@ export default class BackendApi {
 }
 
 class NullAPI {
+    data = {};
     get(api,path,init) {
-        const value = { data: [{ticker: "SPX", qty: 700, pct: 100}] };
+        const value = { data: this.data };
         return new Promise(function(res,rej) {res(value)});
     }
     put(api,path,init) {
+        this.data = init.body;
         return new Promise(function(res,rej) {res()});
     }
 }
 
 class NullAuth {
+    signIn() {}
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTable } from 'react-table';
 
 // See https://react-table.tanstack.com/ for react-table documentation
@@ -9,7 +9,7 @@ const EditableCell = ({
     value: initialValue,
     row: { index },
     column: { id },
-    // TODO:  updateMyData, // A custom callback
+    updateMyData, // A custom callback, passed through useTable
 }) => {
     // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState(initialValue)
@@ -20,7 +20,7 @@ const EditableCell = ({
 
     // We'll only update the over all table's data when the input is blurred
     const onBlur = () => {
-        // TODO   updateMyData(index, id, value)
+        updateMyData(index, id, value)
     }
 
     // If the initialValue is changed external, sync our state up with it
@@ -36,27 +36,38 @@ const EditableCell = ({
 
 /* data and columns - per react-table documentation
  * edit - truthy to show edit controls and allow editing
- * newData - a callback for providing updates to the data
+ * onUpdate - a callback for providing updates to the data
  */
-function TableConfigurable(props) {
+function TableConfigurable({ data, columns, edit, onUpdate }) {
 
-    const columns = props.columns;
-
-    const [data, setData] = useState(props.data);
     const handleAddNewRow = () => {
         const tmpData = data.concat();
         const arrayOfRowEntries = columns.map(columnDefinition => [columnDefinition.accessor, ""]);
         const blankRowObject = Object.fromEntries(arrayOfRowEntries);
         tmpData.push(blankRowObject);
-        setData(tmpData);
+        onUpdate && onUpdate(tmpData);
     };
 
+    const updateMyData = (rowIndex, columnId, value) => {
+        const update = old =>
+            old.map((row, index) => {
+                if (index === rowIndex) {
+                    return {
+                        ...old[rowIndex],
+                        [columnId]: value,
+                    }
+                }
+                return row
+            })
+        onUpdate(update(data));
+    }
+
     // Set the cell renderer to editable or not, depending on edit state
-    const defaultColumn = props.edit ? {
+    const defaultColumn = edit ? {
         Cell: EditableCell,
     } : {};
 
-    const tableInstance = useTable({ columns, data, defaultColumn, /* TODO: updateTableLocalData */ })
+    const tableInstance = useTable({ columns, data, defaultColumn, updateMyData })
 
     const {
         getTableProps,
@@ -111,7 +122,7 @@ function TableConfigurable(props) {
                 </tbody>
             </table>
             {
-                props.edit ? <button onClick={handleAddNewRow}>Add New Row</button> : null
+                edit ? <button onClick={handleAddNewRow}>Add New Row</button> : null
             }
 
         </div>

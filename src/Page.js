@@ -3,14 +3,18 @@ import { TableConfigurable } from "./Table"
 
 const Page = (props) => {
 
+
     const [portfolio, setPortfolio] = useState(null);
+    const [preEditPortfolio, setPreEditPortfolio] = useState(null);
+
     useEffect(() => {
         let mounted = true;
         const fetchPortfolio = async () => {
             if (props.backend) {
                 props.backend.getPortfolio().then(data => {
                     if (mounted) {
-                        setPortfolio(data)
+                        setPortfolio(data);
+                        setPreEditPortfolio(data);
                     }
                 }).catch(error => {
                     console.log("Error from props.backend.getPortfolio():");
@@ -21,6 +25,10 @@ const Page = (props) => {
         fetchPortfolio();
         return () => { mounted = false };
     }, [props.backend]);
+
+    const handleTableUpdate = data => {
+        setPortfolio(data);
+    };
 
     const [pageState, setPageState] = useState("regular"); // Alternative is "editing"
 
@@ -38,34 +46,56 @@ const Page = (props) => {
             accessor: 'pct'
         }
     ];
+
+    // const [portfolioBeforeEditClick,setPortfolioBeforeEditClick] = useState(null);
+    const handleEditClick = () => {
+        setPageState("editing");
+    }
+    const handleCancelClick = () => {
+        setPageState("regular");
+        setPortfolio(preEditPortfolio)
+    }
+    const handleSaveClick = () => {
+        setPageState("regular");
+        setPreEditPortfolio(portfolio);
+        props.backend.setPortfolio(portfolio);
+    }
+
     if (portfolio === null) return "Loading...";
     return (
         <div>
-            <TableConfigurable data={portfolio} columns={columns} edit={pageState === "editing"}></TableConfigurable>
-            <PageStateButtons state={pageState} onNewState={setPageState} />
+            <TableConfigurable
+                data={portfolio}
+                columns={columns}
+                edit={pageState === "editing"}
+                onUpdate={handleTableUpdate}
+            />
+            <PageStateButtons
+                state={pageState}
+                onEditClick={handleEditClick}
+                onCancelClick={handleCancelClick}
+                onSaveClick={handleSaveClick}
+            />
         </div>
     )
-}
+};
 
-/* Attributes:
- * state = "editing" | "regular"
- * onNewState = callback, passing new state
- */
-const PageStateButtons = props => {
-    if (props.state === "regular") {
+
+const PageStateButtons = ({ state, onEditClick, onCancelClick, onSaveClick }) => {
+    if (state === "regular") {
         return (
-            <button onClick={() => props.onNewState("editing")}>Edit</button>
+            <button onClick={onEditClick}>Edit</button>
         )
     }
-    if (props.state === "editing") {
+    if (state === "editing") {
         return (
             <div>
-                <button>Cancel</button>
-                <button>Save</button>
+                <button onClick={onCancelClick}>Cancel</button>
+                <button onClick={onSaveClick}>Save</button>
             </div>
         )
     }
     return null;
-}
+};
 
 export { Page };

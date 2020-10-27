@@ -1,6 +1,4 @@
-"use strict";
-
-import { findAllByAltText } from '@testing-library/react';
+// import { findAllByAltText } from '@testing-library/react';
 import BackendApi from './BackendApi';
 
 test('setPortfolio reports okay', () => {
@@ -24,9 +22,7 @@ test('factory really returns something', () => {
     expect(backendApi).not.toBe(undefined);
 });
 
-const writeAndReadBack = async (testValue) => {
-    // Arrange...
-    const backendApi = BackendApi.create();
+const writeAndReadBack = async (backendApi, testValue) => {
 
     return (
         backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
@@ -49,12 +45,24 @@ const writeAndReadBack = async (testValue) => {
 
 test('backend recalls same value stored, original hard coded value', () => {
     const testValue = [{ ticker: "SPX", qty: 700, pct: 100 }];
-    return (writeAndReadBack(testValue));
+    return (writeAndReadBack(BackendApi.create(), testValue));
 });
 
 test('backend recalls same value stored, new non-hard coded value', () => {
     const testValue = [{ ticker: "SPX", qty: 600, pct: 100 }];
-    return (writeAndReadBack(testValue));
+    return (writeAndReadBack(BackendApi.create(), testValue));
+});
+
+// --------------------------- Nullable -----------------------------
+
+test('backend recalls same value stored, original hard coded value', () => {
+    const testValue = [{ ticker: "SPX", qty: 700, pct: 100 }];
+    return (writeAndReadBack(BackendApi.createNull(), testValue));
+});
+
+test('backend recalls same value stored, new non-hard coded value', () => {
+    const testValue = [{ ticker: "SPX", qty: 600, pct: 100 }];
+    return (writeAndReadBack(BackendApi.createNull(), testValue));
 });
 
 // TODO:
