@@ -14,50 +14,6 @@
     }
   },
   "function": {
-    "portfolio": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "auth",
-          "resourceName": "rebalancec4a90fa9",
-          "attributes": [
-            "UserPoolId"
-          ]
-        },
-        {
-          "category": "storage",
-          "resourceName": "dynamo",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        }
-      ]
-    },
-    "prices": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "auth",
-          "resourceName": "rebalancec4a90fa9",
-          "attributes": [
-            "UserPoolId"
-          ]
-        },
-        {
-          "category": "storage",
-          "resourceName": "dynamo",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        }
-      ]
-    },
     "portfolioHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -91,6 +47,12 @@
           ]
         }
       ]
+    },
+    "pricesHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": []
     }
   },
   "api": {
@@ -100,7 +62,7 @@
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "prices",
+          "resourceName": "portfolioHandler",
           "attributes": [
             "Name",
             "Arn"
@@ -108,7 +70,7 @@
         },
         {
           "category": "function",
-          "resourceName": "portfolioHandler",
+          "resourceName": "pricesHandler",
           "attributes": [
             "Name",
             "Arn"

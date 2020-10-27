@@ -12,6 +12,9 @@ const Page = (props) => {
         const fetchPortfolio = async () => {
             if (props.backend) {
                 props.backend.getPortfolio().then(data => {
+                    //
+                    // data should contain only columns ticker, qty, and pct
+                    //
                     if (mounted) {
                         setPortfolio(data);
                         setPreEditPortfolio(data);
@@ -27,7 +30,11 @@ const Page = (props) => {
     }, [props.backend]);
 
     const handleTableUpdate = data => {
-        setPortfolio(data);
+        //
+        // `data` may contain the entire table as shown to the user,
+        // but we only want ticker, qty, and pct written into the portfolio data
+        //
+        setPortfolio(data.map(({ticker, qty, pct}) => {return {ticker, qty, pct}}));
     };
 
     const [pageState, setPageState] = useState("regular"); // Alternative is "editing"
@@ -44,6 +51,10 @@ const Page = (props) => {
         {
             Header: 'Target %',
             accessor: 'pct'
+        },
+        {
+            Header: 'Price',
+            accessor: 'price'
         }
     ];
 
@@ -61,11 +72,25 @@ const Page = (props) => {
         props.backend.setPortfolio(portfolio);
     }
 
+    const prices = [{ticker: "SPX", price: 3390.68}, {ticker: "BND", price: 88.04}];
+
+    const tableFrom = ({portfolio}) => {
+        if(portfolio===null) return null;
+        const map = new Map();
+        prices.forEach(({ticker, price})=>map.set(ticker,price));
+        const price = ticker => {
+            return map.get(ticker); // can return `undefined`
+        }
+        return portfolio.map( ({ticker, qty, pct}) => {
+            return {ticker, qty, pct, price: price(ticker)};
+        });
+    };
+
     if (portfolio === null) return "Loading...";
     return (
         <div>
             <TableConfigurable
-                data={portfolio}
+                data={tableFrom({portfolio /*,prices*/})}
                 columns={columns}
                 edit={pageState === "editing"}
                 onUpdate={handleTableUpdate}

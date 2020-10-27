@@ -1,17 +1,6 @@
 {
     "paths": [
         {
-            "name": "/prices",
-            "lambdaFunction": "prices",
-            "privacy": {
-                "private": true,
-                "auth": [
-                    "/GET"
-                ]
-            },
-            "policyResourceName": "/prices"
-        },
-        {
             "name": "/portfolio",
             "lambdaFunction": "portfolioHandler",
             "privacy": {
@@ -24,16 +13,26 @@
                     "/DELETE"
                 ]
             }
+        },
+        {
+            "name": "/prices",
+            "lambdaFunction": "pricesHandler",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/GET"
+                ]
+            }
         }
     ],
     "resourceName": "api",
     "apiName": "api",
     "functionArns": [
         {
-            "lambdaFunction": "prices"
+            "lambdaFunction": "portfolioHandler"
         },
         {
-            "lambdaFunction": "portfolioHandler"
+            "lambdaFunction": "pricesHandler"
         }
     ],
     "privacy": {
@@ -45,7 +44,7 @@
     "dependsOn": [
         {
             "category": "function",
-            "resourceName": "prices",
+            "resourceName": "portfolioHandler",
             "attributes": [
                 "Name",
                 "Arn"
@@ -53,12 +52,12 @@
         },
         {
             "category": "function",
-            "resourceName": "portfolioHandler",
+            "resourceName": "pricesHandler",
             "attributes": [
                 "Name",
                 "Arn"
             ]
         }
     ],
-    "uuid": "86f203ea"
+    "uuid": "559c2541"
 }

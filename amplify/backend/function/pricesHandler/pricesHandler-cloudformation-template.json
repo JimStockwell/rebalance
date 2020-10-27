@@ -9,18 +9,6 @@
     },
     "env": {
       "Type": "String"
-    },
-    "authrebalancec4a90fa9UserPoolId": {
-      "Type": "String",
-      "Default": "authrebalancec4a90fa9UserPoolId"
-    },
-    "storagedynamoName": {
-      "Type": "String",
-      "Default": "storagedynamoName"
-    },
-    "storagedynamoArn": {
-      "Type": "String",
-      "Default": "storagedynamoArn"
     }
   },
   "Conditions": {
@@ -41,16 +29,16 @@
         "aws:asset:property": "Code"
       },
       "Properties": {
-        "Handler": "example.LambdaRequestHandler::handleRequest",
+        "Handler": "index.handler",
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "prices",
+            "pricesHandler",
             {
               "Fn::Join": [
                 "",
                 [
-                  "prices",
+                  "pricesHandler",
                   "-",
                   {
                     "Ref": "env"
@@ -67,15 +55,6 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
-            },
-            "AUTH_REBALANCEC4A90FA9_USERPOOLID": {
-              "Ref": "authrebalancec4a90fa9UserPoolId"
-            },
-            "STORAGE_DYNAMO_NAME": {
-              "Ref": "storagedynamoName"
-            },
-            "STORAGE_DYNAMO_ARN": {
-              "Ref": "storagedynamoArn"
             }
           }
         },
@@ -85,12 +64,12 @@
             "Arn"
           ]
         },
-        "Runtime": "java11",
+        "Runtime": "nodejs12.x",
         "Layers": [],
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-rebalance-dev-153321-deployment",
-          "S3Key": "amplify-builds/prices-762b6974482f4f616f77-build.zip"
+          "S3Key": "amplify-builds/pricesHandler-4c416c3859514a63484f-build.zip"
         }
       }
     },
@@ -100,12 +79,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "rebalanceLambdaRole67c44008",
+            "rebalanceLambdaRolecebd4126",
             {
               "Fn::Join": [
                 "",
                 [
-                  "rebalanceLambdaRole67c44008",
+                  "rebalanceLambdaRolecebd4126",
                   "-",
                   {
                     "Ref": "env"
@@ -171,92 +150,6 @@
                   }
                 ]
               }
-            }
-          ]
-        }
-      }
-    },
-    "AmplifyResourcesPolicy": {
-      "DependsOn": [
-        "LambdaExecutionRole"
-      ],
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-        "PolicyName": "amplify-lambda-execution-policy",
-        "Roles": [
-          {
-            "Ref": "LambdaExecutionRole"
-          }
-        ],
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "cognito-identity:Describe*",
-                "cognito-identity:Get*",
-                "cognito-identity:List*",
-                "cognito-idp:Describe*",
-                "cognito-idp:AdminGetDevice",
-                "cognito-idp:AdminGetUser",
-                "cognito-idp:AdminList*",
-                "cognito-idp:List*",
-                "cognito-sync:Describe*",
-                "cognito-sync:Get*",
-                "cognito-sync:List*",
-                "iam:ListOpenIdConnectProviders",
-                "iam:ListRoles",
-                "sns:ListPlatformApplications"
-              ],
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:cognito-idp:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":userpool/",
-                      {
-                        "Ref": "authrebalancec4a90fa9UserPoolId"
-                      }
-                    ]
-                  ]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:Get*",
-                "dynamodb:BatchGetItem",
-                "dynamodb:List*",
-                "dynamodb:Describe*",
-                "dynamodb:Scan",
-                "dynamodb:Query"
-              ],
-              "Resource": [
-                {
-                  "Ref": "storagedynamoArn"
-                },
-                {
-                  "Fn::Join": [
-                    "/",
-                    [
-                      {
-                        "Ref": "storagedynamoArn"
-                      },
-                      "index/*"
-                    ]
-                  ]
-                }
-              ]
             }
           ]
         }
