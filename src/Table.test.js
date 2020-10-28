@@ -62,24 +62,20 @@ test('When in edit mode, cells are editable', () => {
   expect(element).toHaveValue("Jill");
 });
 
-test('When "Add New Row" is clicked, a new blank row really is added', done => {
+test('When "Add New Row" is clicked, a new blank row really is added', () => {
   const { data, columns } = getDefaultTestData();
   const arrayOfBlankEntries = columns.map(columnDefinition => [columnDefinition.accessor, ""]);
   const blankRowObject = Object.fromEntries(arrayOfBlankEntries);
   const expectedNewData = data.concat([blankRowObject]);
-  const newDataHandler = newData => {
-    try {
-      expect(newData).toEqual(expectedNewData);
-      done();
-    } catch (error) {
-      done(error);
-    }
-  };
-
+  const newDataHandler = jest.fn();
+ 
   render(<TableConfigurable data={data} columns={columns} edit onUpdate={newDataHandler} />);
   const addNewRowButton = screen.getByText('Add New Row');
 
   fireEvent.click(addNewRowButton);
+  
+  expect(newDataHandler).toHaveBeenCalledTimes(1);
+  expect(newDataHandler).toHaveBeenCalledWith(expectedNewData);
 });
 
 test('When "Add New Row" is clicked with no callback, it does not crash', () => {
@@ -91,27 +87,23 @@ test('When "Add New Row" is clicked with no callback, it does not crash', () => 
   fireEvent.click(addNewRowButton);
 });
 
-test('When a cell is edited, it is reflected in the callback', done => {
+test('When a cell is edited, it is reflected in the callback', () => {
   const { data, columns } = getDefaultTestData();
   const expectedNewData = [{ "col1": "Ms", "col2": "Poppins" }, { "col1": "Vernor", "col2": "Vinge" }]
-  const newDataHandler = newData => {
-    try {
-      expect(newData).toEqual(expectedNewData);
-      done();
-    } catch (error) {
-      done(error);
-    }
-  };
-
+  const newDataHandler = jest.fn();
   render(<TableConfigurable data={data} columns={columns} edit onUpdate={newDataHandler} />);
   const tickerCell = screen.getByDisplayValue('Mary');
+  
   fireEvent.focus(tickerCell);
   userEvent.type(tickerCell, "Ms");
   fireEvent.blur(tickerCell);
 
+  expect(newDataHandler).toHaveBeenCalledTimes(1);
+  expect(newDataHandler).toHaveBeenCalledWith(expectedNewData);
 });
 
 test.todo('In edit mode, a delete button shows up on each row');
+test.todo('In edit mode, the prices and calculated fields are not editable');
 
 //------------------- Utility Functions ---------------
 
