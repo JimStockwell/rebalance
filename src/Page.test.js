@@ -204,13 +204,15 @@ test('Cancel after prior edit brings us to saved data, not original data', async
 
 // ------------------- prices -----------------------------------
 
-test('Cells for prcing work', async () => {
+test('Cells for pricing work', async () => {
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([
         { ticker: "SPX", qty: 700, pct: 100 },
         { ticker: "BND", qty: 800, pct: 40 }
     ]);
+    // TODO:
     // backendApi.setPrices([{"SPX",3390.68},{"BND",88.04}]);
+    // Hardcoded in for now
 
     render(<Page backend={backendApi} />);
 
