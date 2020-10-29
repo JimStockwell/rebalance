@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TableConfigurable } from "./Table"
 
-const Page = (props) => {
+const Page = ({backend}) => {
 
 
     const [portfolio, setPortfolio] = useState(null);
@@ -10,8 +10,8 @@ const Page = (props) => {
     useEffect(() => {
         let mounted = true;
         const fetchPortfolio = async () => {
-            if (props.backend) {
-                props.backend.getPortfolio().then(data => {
+            if (backend) {
+                backend.getPortfolio().then(data => {
                     //
                     // data should contain only columns ticker, qty, and pct
                     //
@@ -20,14 +20,14 @@ const Page = (props) => {
                         setPreEditPortfolio(data);
                     }
                 }).catch(error => {
-                    console.log("Error from props.backend.getPortfolio():");
+                    console.log("Error from backend.getPortfolio():");
                     console.log(error);
                 });
             }
         }
         fetchPortfolio();
         return () => { mounted = false };
-    }, [props.backend]);
+    }, [backend]);
 
     const handleTableUpdate = data => {
         //
@@ -69,7 +69,7 @@ const Page = (props) => {
     const handleSaveClick = () => {
         setPageState("regular");
         setPreEditPortfolio(portfolio);
-        props.backend.setPortfolio(portfolio);
+        backend.setPortfolio(portfolio);
     }
 
     const prices = [{ticker: "SPX", price: 3390.68}, {ticker: "BND", price: 88.04}];
