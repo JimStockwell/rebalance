@@ -2,6 +2,8 @@
 // Wrapper for backend API
 // (Includes a null version constructor)
 //
+// BackendApi: Getting things from the backend and presenting it in a convenient way.
+//
 import Amplify, { Auth, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
 
@@ -42,7 +44,7 @@ export default class BackendApi {
         );
     }
 
-    async setPortfolio(body) { // inspired by https://docs.amplify.aws/lib/restapi/update/q/platform/js
+    async setPortfolio(body) { // inspired by [Updating data](https://docs.amplify.aws/lib/restapi/update/q/platform/js)
         const myInit = {
             body: body,
             headers: {}, // OPTIONAL
@@ -60,8 +62,11 @@ export default class BackendApi {
         }
     }
 
-    async getPrice(ticker) {
+    async getPrice(ticker) { // inspired by [Fetching data](https://docs.amplify.aws/lib/restapi/fetch/q/platform/js)
         const myInit = { // OPTIONAL
+            'queryStringParameters': {
+                'ticker': ticker
+            },
             headers: {}, // OPTIONAL
             response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
         };
@@ -69,17 +74,32 @@ export default class BackendApi {
         return this._api.get(apiName, "/prices", myInit)
             .then(response => ({ ticker: ticker, price: response.data.c }));
     }
+
+    // Only works with null version
+    addPrice(priceObject) {
+        this._api.addPrice(priceObject)
+    }
 }
 
 class NullAPI {
-    data = {};
+    _portfolioData = {}; // TODO: Rename to _portfolioData
+    _pricesData = new Map();
     get(api, path, init) {
-        const value = { data: this.data };
-        return new Promise(function (res, rej) { res(value) });
+        if(path==="/portfolio") {
+            const value = { data: this._portfolioData };
+            return new Promise(function (res, rej) { res(value) });
+        }
+        if(path==="/prices") {
+            const value = { data: {c: this._pricesData.get(init.queryStringParameters.ticker)}};
+            return new Promise(function (res, rej) { res( value )});
+        }
     }
     put(api, path, init) {
-        this.data = init.body;
+        this._portfolioData = init.body;
         return new Promise(function (res, rej) { res() });
+    }
+    addPrice({ticker, price}) {
+        this._pricesData.set(ticker, price);
     }
 }
 

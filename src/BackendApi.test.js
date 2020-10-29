@@ -67,19 +67,29 @@ test('backend recalls same value stored, new non-hard coded value', () => {
 
 // ----------------------------------- Pricing --------------------------------------------
 
-test('Call to getPrice returns data', async () => {
+test('Call to real getPrice returns data', async () => {
     const backendApi = BackendApi.create();
     await backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
 
     const result = await backendApi.getPrice("BWX");
 
-    // TODO: we will need 1) to relax this to simply being numbers, and
-    //                    2) making an exact number version that runs off the null api
     expect(result.ticker).toBe("BWX");
     expect(typeof (result.price)).toBe("number");
     expect(result.price).toBeGreaterThanOrEqual(0);
 });
 
+test('Call to null getPrice returns specific data', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
+
+    backendApi.addPrice({ticker: "BWX", price: 90.00});
+    const result = await backendApi.getPrice("BWX");
+
+    expect(result.ticker).toBe("BWX");
+    expect(result.price).toBe(90.00);
+});
+
+test.todo('setPrice should throw in non-null version');
 test.todo('Call to getPricing works with multiple stocks');
 test.todo('null Pricing sets and returns specific prices');
 test.todo('null Pricing, when not set, throws');

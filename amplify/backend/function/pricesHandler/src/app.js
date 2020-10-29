@@ -32,7 +32,7 @@ app.use(function (req, res, next) {
 
 app.get('/prices', function (req, resForMyApp) {
   // Add your code here
-  const ticker = "BWX";
+  const ticker = req.query.ticker;
   const key = process.env.STOCK_API_KEY;
   const url = "https://finnhub.io/api/v1/quote?symbol=" + ticker + "&token=" + key;
 
