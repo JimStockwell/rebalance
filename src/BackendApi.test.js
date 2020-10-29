@@ -5,13 +5,13 @@ test('setPortfolio reports okay', () => {
     // Arrange...
     const backendApi = BackendApi.create();
 
-    return(
+    return (
         backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
 
-        // Act...
-        .then(() => {
-            backendApi.setPortfolio([{ticker: 'SPX', qty: 100, pct: 100}]);
-        })
+            // Act...
+            .then(() => {
+                backendApi.setPortfolio([{ ticker: 'SPX', qty: 100, pct: 100 }]);
+            })
     )
 });
 
@@ -53,7 +53,7 @@ test('backend recalls same value stored, new non-hard coded value', () => {
     return (writeAndReadBack(BackendApi.create(), testValue));
 });
 
-// --------------------------- Nullable -----------------------------
+// --------------------------- Nullable setPortfolio and getPortfolio ----------------------
 
 test('backend recalls same value stored, original hard coded value', () => {
     const testValue = [{ ticker: "SPX", qty: 700, pct: 100 }];
@@ -65,10 +65,26 @@ test('backend recalls same value stored, new non-hard coded value', () => {
     return (writeAndReadBack(BackendApi.createNull(), testValue));
 });
 
-// TODO:
-//   Test that changes to setPortfolio are reflected in getPortfolio
-//   Test that changes to user result in change of stored data
-//   Everything with prices still
-//   Backend gives out CORS headers that will work whether the front-end host
-//     is the development host or the production host.
-//   Test DELETE
+// ----------------------------------- Pricing --------------------------------------------
+
+test('Call to getPrice returns data', async () => {
+    const backendApi = BackendApi.create();
+    await backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
+
+    const result = await backendApi.getPrice("BWX");
+
+    // TODO: we will need 1) to relax this to simply being numbers, and
+    //                    2) making an exact number version that runs off the null api
+    expect(result.ticker).toBe("BWX");
+    expect(typeof (result.price)).toBe("number");
+    expect(result.price).toBeGreaterThanOrEqual(0);
+});
+
+test.todo('Call to getPricing works with multiple stocks');
+test.todo('null Pricing sets and returns specific prices');
+test.todo('null Pricing, when not set, throws');
+
+
+test.todo('Changes in user result in change of strored data');
+test.todo('Backend gives out CORS headers that will work in dev and production');
+test.todo('deleting the portfolio works');

@@ -220,10 +220,11 @@ test('Cells for prcing work', async () => {
     expect(within(row2).getByText('88.04')).toBeInTheDocument();
 });
 
+test.todo('Push prices down into BackendApi. Get all at once; is simpler.');
+
 test.todo('Different users have their own data');
 test.todo('If data fails to save, we complain and stay on the edit screen');
 test.todo('If data fails to load, do something sensible (what do we do now?)');
-test.todo('Prices');
 test.todo('Calculated fields');
 
 

@@ -69,7 +69,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-rebalance-dev-153321-deployment",
-          "S3Key": "amplify-builds/pricesHandler-4c416c3859514a63484f-build.zip"
+          "S3Key": "amplify-builds/pricesHandler-5636556a5a3462544a41-build.zip"
         }
       }
     },
