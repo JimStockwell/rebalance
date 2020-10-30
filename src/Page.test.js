@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, render, screen, waitForElement, fireEvent, within, findByText, wait } from '@testing-library/react';
+import { render, screen, waitForElement, fireEvent, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'
 import { Page } from './Page';
 import BackendApi from './BackendApi';
@@ -183,11 +183,6 @@ test('Save button saves to back-end', async () => {
 });
 
 test('Cancel after prior edit brings us to saved data, not original data', async () => {
-
-    const clickByName = async label => {
-        const button = await waitForElement(() => screen.queryByText(label));
-        fireEvent.click(button);
-    }
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
     render(<Page backend={backendApi} />);
@@ -203,7 +198,7 @@ test('Cancel after prior edit brings us to saved data, not original data', async
     expect(countOfRows(finalTable)).toBe(rowsBeforeAdd + 1);
 });
 
-// ------------------- prices -----------------------------------
+// ------------------- prices and values -----------------------------------
 
 test('Prices retrieve and display', async () => {
     const backendApi = BackendApi.createNull();
@@ -211,7 +206,6 @@ test('Prices retrieve and display', async () => {
         { ticker: "SPX", qty: 700, pct: 100 },
         { ticker: "BND", qty: 800, pct: 40 }
     ]);
-
     backendApi.addPrice({ ticker: "SPX", price: 3390.00 });
     backendApi.addPrice({ ticker: "BND", price: 88.04 });
 
@@ -224,11 +218,6 @@ test('Prices retrieve and display', async () => {
 });
 
 test('Prices update after save', async () => {
-
-    const clickByName = async label => {
-        const button = await screen.findByText(label);
-        fireEvent.click(button);
-    }
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
     backendApi.addPrice({ ticker: "BND", price: 88.04 });
@@ -241,11 +230,7 @@ test('Prices update after save', async () => {
     await screen.findByDisplayValue("BND");
     await clickByName("Save");
 
-    // const updatedPrice = await screen.findByText('88.04')
-    // expect(updatedPrice).toBeInTheDocument();
-
     await screen.findByText('88.04');
-
 });
 
 test.todo('Different users have their own data');
@@ -256,6 +241,11 @@ test.todo('Calculated fields');
 
 // ---------------------- utility functions ---------------------
 
-function countOfRows(node) {
+const countOfRows = node => {
     return node.querySelectorAll('tr').length;
-}
+};
+
+const clickByName = async label => {
+    const button = await screen.findByText(label);
+    fireEvent.click(button);
+};
