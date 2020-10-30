@@ -82,7 +82,7 @@ test('Call to null getPrice returns specific data', async () => {
     const backendApi = BackendApi.createNull();
     await backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
 
-    backendApi.addPrice({ticker: "BWX", price: 90.00});
+    backendApi.addPrice({ ticker: "BWX", price: 90.00 });
     const result = await backendApi.getPrice("BWX");
 
     expect(result.ticker).toBe("BWX");
@@ -90,7 +90,6 @@ test('Call to null getPrice returns specific data', async () => {
 });
 
 test.todo('setPrice should throw in non-null version');
-test.todo('Call to getPricing works with multiple stocks');
 test.todo('null Pricing sets and returns specific prices');
 test.todo('null Pricing, when not set, throws');
 

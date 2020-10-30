@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, waitForElement, fireEvent, within } from '@testing-library/react';
+import { act, render, screen, waitForElement, fireEvent, within, findByText, wait } from '@testing-library/react';
+import userEvent from '@testing-library/user-event'
 import { Page } from './Page';
 import BackendApi from './BackendApi';
 
@@ -168,16 +169,16 @@ test('Save button saves to back-end', async () => {
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
     render(<Page backend={backendApi} />);
-
-    // Edit the table, add a line, then save
     const editButton = await waitForElement(() => screen.queryByText("Edit"));
     fireEvent.click(editButton);
     const addNewRowButton = await waitForElement(() => screen.queryByText("Add New Row"));
     fireEvent.click(addNewRowButton);
     const saveButton = await waitForElement(() => screen.queryByText("Save"));
+
     fireEvent.click(saveButton);
 
     // Confirm the updated table was written to the back end
+    await screen.findByRole("table");
     expect(await backendApi.getPortfolio()).toEqual([{ ticker: "SPX", qty: 700, pct: 100 }, { ticker: "", qty: "", pct: "" }]);
 });
 
@@ -204,25 +205,48 @@ test('Cancel after prior edit brings us to saved data, not original data', async
 
 // ------------------- prices -----------------------------------
 
-test('Cells for pricing work', async () => {
+test('Prices retrieve and display', async () => {
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([
         { ticker: "SPX", qty: 700, pct: 100 },
         { ticker: "BND", qty: 800, pct: 40 }
     ]);
-    // TODO:
-    // backendApi.setPrices([{"SPX",3390.68},{"BND",88.04}]);
-    // Hardcoded in for now
+
+    backendApi.addPrice({ ticker: "SPX", price: 3390.00 });
+    backendApi.addPrice({ ticker: "BND", price: 88.04 });
 
     render(<Page backend={backendApi} />);
 
-    const row1 = (await waitForElement(() => screen.queryByText('SPX'))).closest("tr");
-    expect(within(row1).getByText('3390.68')).toBeInTheDocument();
-    const row2 = screen.getByText('BND').closest("tr");
-    expect(within(row2).getByText('88.04')).toBeInTheDocument();
+    const row1 = (await screen.findByText('SPX')).closest("tr");
+    await within(row1).findByText('3390');
+    const row2 = (await screen.findByText('BND')).closest("tr");
+    await within(row2).findByText('88.04');
 });
 
-test.todo('Push prices down into BackendApi. Get all at once; is simpler.');
+test('Prices update after save', async () => {
+
+    const clickByName = async label => {
+        const button = await screen.findByText(label);
+        fireEvent.click(button);
+    }
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
+    backendApi.addPrice({ ticker: "BND", price: 88.04 });
+    render(<Page backend={backendApi} />);
+    await clickByName("Edit");
+    const tickerCell = await screen.findByDisplayValue('SPX');
+
+    await userEvent.type(tickerCell, "BND");
+    fireEvent.blur(tickerCell);
+    await screen.findByDisplayValue("BND");
+    await clickByName("Save");
+
+    // const updatedPrice = await screen.findByText('88.04')
+    // expect(updatedPrice).toBeInTheDocument();
+
+    await screen.findByText('88.04');
+
+});
 
 test.todo('Different users have their own data');
 test.todo('If data fails to save, we complain and stay on the edit screen');
