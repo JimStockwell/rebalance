@@ -118,13 +118,12 @@ test('Cancel button restores pre-edit table data', async () => {
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
     render(<Page backend={backendApi} />);
-
-    // Edit the table, add a line, then cancel
     const rowsBeforeAdd = countOfRows(await waitForElement(() => screen.queryByRole("table")));
     const editButton = await waitForElement(() => screen.queryByText("Edit"));
     fireEvent.click(editButton);
     const addNewRowButton = await waitForElement(() => screen.queryByText("Add New Row"));
     fireEvent.click(addNewRowButton);
+
     const cancelButton = await waitForElement(() => screen.queryByText("Cancel"));
     fireEvent.click(cancelButton);
 
@@ -151,13 +150,12 @@ test('Save button does not restore pre-edit table data', async () => {
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
     render(<Page backend={backendApi} />);
-
-    // Edit the table, add a line, then save
     const rowsBeforeAdd = countOfRows(await waitForElement(() => screen.queryByRole("table")));
     const editButton = await waitForElement(() => screen.queryByText("Edit"));
     fireEvent.click(editButton);
     const addNewRowButton = await waitForElement(() => screen.queryByText("Add New Row"));
     fireEvent.click(addNewRowButton);
+
     const saveButton = await waitForElement(() => screen.queryByText("Save"));
     fireEvent.click(saveButton);
 
@@ -224,13 +222,24 @@ test('Prices update after save', async () => {
     render(<Page backend={backendApi} />);
     await clickByName("Edit");
     const tickerCell = await screen.findByDisplayValue('SPX');
-
     await userEvent.type(tickerCell, "BND");
     fireEvent.blur(tickerCell);
-    await screen.findByDisplayValue("BND");
+
     await clickByName("Save");
 
     await screen.findByText('88.04');
+});
+
+test('In regular mode, priced rows have calculated values too', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
+    backendApi.addPrice({ ticker: "SPX", price: 3390 });
+    const expectedValue = 700 * 3390;
+
+    render(<Page backend={backendApi} />);
+
+    const row1 = (await screen.findByText('SPX')).closest("tr");
+    await within(row1).findByText(expectedValue.toString());
 });
 
 test.todo('Different users have their own data');

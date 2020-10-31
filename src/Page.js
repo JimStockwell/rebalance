@@ -10,6 +10,8 @@ const Page = ({ backend }) => {
     const [priceLoadsNeededSoFar, setLoadPrices] = useState(0); // any change signals the need to load pricing
     const [prices, setPrices] = useState([]);
 
+    const [pageState, setPageState] = useState("regular"); // Alternative is "editing"
+
     useEffect(() => {
         let mounted = true;
         const fetchPortfolio = async () => {
@@ -35,7 +37,7 @@ const Page = ({ backend }) => {
 
     useEffect(() => {
         // we have been signaled to load prices
-        if (portfolio) {
+        if (portfolio && pageState === "regular") {
             for (let i = 0; i < portfolio.length; i++) {
                 backend.getPrice(portfolio[i].ticker).then(prObj => {
                     setPrices(prevPrices => {
@@ -47,8 +49,7 @@ const Page = ({ backend }) => {
             }
         }
         // we have launched all our price update asyncs
-    },
-        [priceLoadsNeededSoFar]);
+    }, [priceLoadsNeededSoFar, portfolio, backend, pageState]);
 
     const handleTableUpdate = data => {
         //
@@ -58,7 +59,6 @@ const Page = ({ backend }) => {
         setPortfolio(data.map(({ ticker, qty, pct }) => { return { ticker, qty, pct } }));
     };
 
-    const [pageState, setPageState] = useState("regular"); // Alternative is "editing"
 
     const columns = [
         {
@@ -76,6 +76,10 @@ const Page = ({ backend }) => {
         {
             Header: 'Price',
             accessor: 'price'
+        },
+        {
+            Header: 'Value',
+            accessor: 'value'
         }
     ];
 
@@ -98,11 +102,9 @@ const Page = ({ backend }) => {
         if (portfolio === null) return null;
         const map = new Map();
         prices.forEach(({ ticker, price }) => map.set(ticker, price));
-        const price = ticker => {
-            return map.get(ticker); // can return `undefined`
-        }
         return portfolio.map(({ ticker, qty, pct }) => {
-            return { ticker, qty, pct, price: price(ticker) };
+            const price = map.get(ticker) || 0;
+            return { ticker, qty, pct, price: price, value: price * qty };
         });
     };
 
