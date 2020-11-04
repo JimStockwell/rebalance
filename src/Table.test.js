@@ -45,12 +45,17 @@ test('When in regular mode, cells are NOT editable', () => {
 
 //------------------ Edit Mode -------------------------
 
-test('TableConfigurable displays "Add New Row" button when in edit mode', () => {
+test('TableConfigurable displays "Add New Row" and button row delete buttons when in edit mode', () => {
   const { data, columns } = getDefaultTestData();
 
   render(<TableConfigurable data={data} columns={columns} edit />)
 
   expect(screen.getByText('Add New Row').closest("button")).toBeInTheDocument();
+
+  const deleteButtons = screen.getAllByText('Delete Row');
+  expect(deleteButtons.length).toBe(data.length);
+  // TODO: confirm all are actually buttons
+  // TODO: confirm they do the right thing when clicked
 });
 
 test('When in edit mode, cells are editable', () => {
@@ -102,7 +107,6 @@ test('When a cell is edited, it is reflected in the callback', () => {
   expect(newDataHandler).toHaveBeenCalledWith(expectedNewData);
 });
 
-test.todo('In edit mode, a delete button shows up on each row');
 test.todo('In edit mode, the prices and calculated fields are not editable');
 
 //------------------- Utility Functions ---------------
