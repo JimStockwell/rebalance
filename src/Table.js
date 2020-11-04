@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useTable } from 'react-table';
 
 // See https://react-table.tanstack.com/ for react-table documentation
@@ -66,18 +66,28 @@ function TableConfigurable({ data, columns, edit, onUpdate }) {
     const defaultColumn = edit ? {
         Cell: EditableCell,
     } : {};
-    
+ 
+    const handleDelete = useCallback(
+        (index) => {
+            const tmpData = data.concat();
+            tmpData.splice(index,1);
+            onUpdate && onUpdate(tmpData);
+        },
+        [data, onUpdate]
+    );
+
     const columnsWithDelete = useMemo(() => {
         const x = columns.concat();
         x.push({
             Header: '',
             accessor: "delete-button",
             Cell: row => (
-                <button>Delete Row</button>
+                <button onClick={() => handleDelete(row.index)}>Delete Row</button>
             )
         });
         return x;
-    }, [columns]);
+    }, [columns,handleDelete]);
+
 
     const tableInstance = useTable({ columns: columnsWithDelete, data, defaultColumn, updateMyData })
 

@@ -45,17 +45,13 @@ test('When in regular mode, cells are NOT editable', () => {
 
 //------------------ Edit Mode -------------------------
 
-test('TableConfigurable displays "Add New Row" and button row delete buttons when in edit mode', () => {
+test('TableConfigurable displays "Add New Row" and button row delete buttons when in edit mode', async () => {
   const { data, columns } = getDefaultTestData();
 
   render(<TableConfigurable data={data} columns={columns} edit />)
 
+  // There is an Add New Row button
   expect(screen.getByText('Add New Row').closest("button")).toBeInTheDocument();
-
-  const deleteButtons = screen.getAllByText('Delete Row');
-  expect(deleteButtons.length).toBe(data.length);
-  // TODO: confirm all are actually buttons
-  // TODO: confirm they do the right thing when clicked
 });
 
 test('When in edit mode, cells are editable', () => {
@@ -107,6 +103,22 @@ test('When a cell is edited, it is reflected in the callback', () => {
   expect(newDataHandler).toHaveBeenCalledWith(expectedNewData);
 });
 
+test('When in edit mode, "Delete Row" buttons are available and delete rows', async () => {
+  const { data, columns } = getDefaultTestData();
+  const newData = data.concat();
+  newData.shift();
+  const expectedNewData = newData;
+  const newDataHandler = jest.fn();
+  render(<TableConfigurable data={data} columns={columns} onUpdate={newDataHandler} edit />)
+
+  const deleteButtons = screen.getAllByText('Delete Row');
+  expect(deleteButtons.length).toBe(data.length);
+
+  fireEvent.click(deleteButtons[0]);
+
+  expect(newDataHandler).toHaveBeenCalledTimes(1);
+  expect(newDataHandler).toHaveBeenCalledWith(expectedNewData);
+});
 test.todo('In edit mode, the prices and calculated fields are not editable');
 
 //------------------- Utility Functions ---------------
