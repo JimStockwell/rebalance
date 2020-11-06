@@ -32,6 +32,7 @@ test('TableConfigurable hides edit mode controls when out of edit mode', () => {
   render(<TableConfigurable data={data} columns={columns} />)
 
   expect(screen.queryByText('Add New Row')).not.toBeInTheDocument();
+  expect(screen.queryByText('Delete Row')).not.toBeInTheDocument();
 });
 
 test('When in regular mode, cells are NOT editable', () => {
@@ -69,12 +70,12 @@ test('When "Add New Row" is clicked, a new blank row really is added', () => {
   const blankRowObject = Object.fromEntries(arrayOfBlankEntries);
   const expectedNewData = data.concat([blankRowObject]);
   const newDataHandler = jest.fn();
- 
+
   render(<TableConfigurable data={data} columns={columns} edit onUpdate={newDataHandler} />);
   const addNewRowButton = screen.getByText('Add New Row');
 
   fireEvent.click(addNewRowButton);
-  
+
   expect(newDataHandler).toHaveBeenCalledTimes(1);
   expect(newDataHandler).toHaveBeenCalledWith(expectedNewData);
 });
@@ -94,7 +95,7 @@ test('When a cell is edited, it is reflected in the callback', () => {
   const newDataHandler = jest.fn();
   render(<TableConfigurable data={data} columns={columns} edit onUpdate={newDataHandler} />);
   const tickerCell = screen.getByDisplayValue('Mary');
-  
+
   fireEvent.focus(tickerCell);
   userEvent.type(tickerCell, "Ms");
   fireEvent.blur(tickerCell);

@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aws-amplify/ui-react": "^0.2.23",
+    "@aws-amplify/ui-react": "^0.2.27",
     "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
+    "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.1.2",
     "@types/aws-serverless-express": "^3.3.3",
-    "aws-amplify": "^3.3.3",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "aws-amplify": "^3.3.7",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-scripts": "^3.4.4",
-    "react-table": "^7.6.0"
+    "react-table": "^7.6.1"
   },
   "scripts": {
     "start": "react-scripts start",

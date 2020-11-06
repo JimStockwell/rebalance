@@ -1,3 +1,8 @@
+//
+// See "Note: Page/Table Interface" in Page.js
+// for an explanation of Table's "data" and "onUpdate".
+//
+
 import React, { useMemo, useCallback } from 'react';
 import { useTable } from 'react-table';
 
@@ -24,19 +29,26 @@ const EditableCell = ({
     }
 
     // If the initialValue is changed external, sync our state up with it
-    // TODO:
-    //   React.useEffect(() => {
-    //     setValue(initialValue)
-    //   }, [initialValue])
+    React.useEffect(() => {
+        setValue(initialValue)
+    }, [initialValue])
 
     return <input value={value} onChange={onChange} onBlur={onBlur} />
 }
 
 
 
-/* data and columns - per react-table documentation
+/* data - All the data for our table, but not control buttons.  See react-table documentation.
+ * columns - per react-table documentation.  Does not include control buttons.
  * edit - truthy to show edit controls and allow editing
  * onUpdate - a callback for providing updates to the data
+ * 
+ * Note: columns property of Table
+ * "columns" determines what order to present the columns in in the UI.
+ * We do not get a choice of names (accessors), those are expected by Table.
+ * We get a choice of what order they come in,
+ * and whether they are included in the UI.
+ * Whether included or not, they are still calculated.
  */
 function TableConfigurable({ data, columns, edit, onUpdate }) {
 
@@ -66,11 +78,11 @@ function TableConfigurable({ data, columns, edit, onUpdate }) {
     const defaultColumn = edit ? {
         Cell: EditableCell,
     } : {};
- 
+
     const handleDelete = useCallback(
         (index) => {
             const tmpData = data.concat();
-            tmpData.splice(index,1);
+            tmpData.splice(index, 1);
             onUpdate && onUpdate(tmpData);
         },
         [data, onUpdate]
@@ -86,10 +98,10 @@ function TableConfigurable({ data, columns, edit, onUpdate }) {
             )
         });
         return x;
-    }, [columns,handleDelete]);
+    }, [columns, handleDelete]);
 
 
-    const tableInstance = useTable({ columns: columnsWithDelete, data, defaultColumn, updateMyData })
+    const tableInstance = useTable({ columns: edit ? columnsWithDelete : columns, data, defaultColumn, updateMyData })
 
     const {
         getTableProps,

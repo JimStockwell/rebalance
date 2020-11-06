@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitForElement, fireEvent, within } from '@testing-library/react';
+import { render, screen, waitForElement, wait, fireEvent, within, findByText } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'
 import { Page } from './Page';
 import BackendApi from './BackendApi';
@@ -196,7 +196,9 @@ test('Cancel after prior edit brings us to saved data, not original data', async
     expect(countOfRows(finalTable)).toBe(rowsBeforeAdd + 1);
 });
 
-// ------------------- prices and values -----------------------------------
+//------------------
+// Prices and Values
+//------------------
 
 test('Prices retrieve and display', async () => {
     const backendApi = BackendApi.createNull();
@@ -242,6 +244,101 @@ test('In regular mode, priced rows have calculated values too', async () => {
     await within(row1).findByText(expectedValue.toString());
 });
 
+test('In edit mode, there are no prices or values', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([{ ticker: "SPX", qty: 700, pct: 100 }]);
+    backendApi.addPrice({ ticker: "SPX", price: 88.04 });
+    render(<Page backend={backendApi} />);
+    await clickByName("Edit");
+    expect(screen.getByText("Add New Row")).toBeInTheDocument();
+
+    expect(screen.queryByText("Price")).not.toBeInTheDocument();
+    expect(screen.queryByText("Value")).not.toBeInTheDocument();
+    expect(screen.queryByText("Buy")).not.toBeInTheDocument();
+});
+//------------------
+// Buy
+//------------------
+
+const BUY_COLUMN = 5;
+
+test('There is a buy column', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([
+        { ticker: "A", qty: 700, pct: 100 },
+        { ticker: "B", qty: 800, pct: 40 }
+    ]);
+    backendApi.addPrice({ ticker: "A", price: 3390.00 });
+    backendApi.addPrice({ ticker: "B", price: 88.04 });
+
+    render(<Page backend={backendApi} />);
+
+    await screen.findByText((3390 * 700).toString()); // wait for the component to fully update 
+    screen.getByText('Buy');
+});
+
+test('When there is only one item, sell = 0', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([
+        { ticker: "A", qty: 7, pct: 2 },
+    ]);
+    backendApi.addPrice({ ticker: "A", price: 3 });
+
+    render(<Page backend={backendApi} />);
+    await screen.findByText("21"); // wait for component to fully render
+
+    expect(columnValue('A', BUY_COLUMN)).toBe("0");
+});
+
+test('Sell formula is shown correct when we want all one item', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([
+        { ticker: "A", qty: 7, pct: 100 },
+        { ticker: "B", qty: 22, pct: 0 }
+    ]);
+    backendApi.addPrice({ ticker: "A", price: 11 });
+    backendApi.addPrice({ ticker: "B", price: 7 });
+
+    render(<Page backend={backendApi} />);
+    await screen.findByText("77"); // let it finish rendering
+
+    expect(columnValue('A', BUY_COLUMN)).toBe("14");
+    expect(columnValue('B', BUY_COLUMN)).toBe("-22");
+});
+
+test('Sell formula is shown correct when we have all one item', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([
+        { ticker: "A", qty: 0, pct: 50 },
+        { ticker: "B", qty: 200, pct: 50 }
+    ]);
+    backendApi.addPrice({ ticker: "A", price: 2 });
+    backendApi.addPrice({ ticker: "B", price: 3 });
+
+    render(<Page backend={backendApi} />);
+    await screen.findByText("600");
+
+    expect(columnValue('A', BUY_COLUMN)).toBe("150");
+    expect(columnValue('B', BUY_COLUMN)).toBe("-100");
+});
+
+test('Sell formula still works if we get strings in instead of numbers', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([
+        { ticker: "A", qty: 0, pct: 50 },
+        { ticker: "B", qty: "200", pct: "50" }
+    ]);
+    backendApi.addPrice({ ticker: "A", price: 2 });
+    backendApi.addPrice({ ticker: "B", price: "3" });
+
+    render(<Page backend={backendApi} />);
+    await screen.findByText("600");
+
+    expect(columnValue('A', BUY_COLUMN)).toBe("150");
+    expect(columnValue('B', BUY_COLUMN)).toBe("-100");
+});
+
+
 test.todo('Different users have their own data');
 test.todo('If data fails to save, we complain and stay on the edit screen');
 test.todo('If data fails to load, do something sensible (what do we do now?)');
@@ -253,6 +350,12 @@ test.todo('Calculated fields');
 const countOfRows = node => {
     return node.querySelectorAll('tr').length;
 };
+
+const columnValue = (ticker, columnNumber) => {
+    const row = screen.getByText(ticker).closest("tr");
+    const result = row.querySelectorAll('td')[columnNumber].textContent;
+    return result;
+}
 
 const clickByName = async label => {
     const button = await screen.findByText(label);
