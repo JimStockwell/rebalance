@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitForElement, wait, fireEvent, within, findByText } from '@testing-library/react';
+import { render, screen, waitForElement, fireEvent, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'
 import { Page } from './Page';
 import BackendApi from './BackendApi';
@@ -200,6 +200,8 @@ test('Cancel after prior edit brings us to saved data, not original data', async
 // Prices and Values
 //------------------
 
+const VALUE_COLUMN = 4;
+
 test('Prices retrieve and display', async () => {
     const backendApi = BackendApi.createNull();
     await backendApi.setPortfolio([
@@ -242,6 +244,17 @@ test('In regular mode, priced rows have calculated values too', async () => {
 
     const row1 = (await screen.findByText('SPX')).closest("tr");
     await within(row1).findByText(expectedValue.toString());
+});
+
+test('Value column is rounded to whole dollar amounts', async () => {
+    const backendApi = BackendApi.createNull();
+    await backendApi.setPortfolio([{ ticker: "SPX", qty: 1, pct: 100 }]);
+    backendApi.addPrice({ ticker: "SPX", price: 3.99 });
+
+    render(<Page backend={backendApi} />);
+
+    await screen.findByText('3.99');
+    expect(columnValue('SPX', VALUE_COLUMN)).toBe("4");
 });
 
 test('In edit mode, there are no prices or values', async () => {

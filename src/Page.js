@@ -146,7 +146,7 @@ const Page = ({ backend }) => {
             const totalValue = firstPass.map(({ value }) => value).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
             const totalPct = firstPass.map(({ pct }) => Number(pct)).reduce((accumulator, currentValue) => accumulator + currentValue, 0)
             const secondPass = firstPass.map(row => {
-                return ({ ...row, buy: Math.round((row.pct / totalPct - row.value / totalValue) * totalValue / row.price) });
+                return ({ ...row, value: Math.round(row.value), buy: Math.round((row.pct / totalPct - row.value / totalValue) * totalValue / row.price) });
             });
             return secondPass;
         } else {
