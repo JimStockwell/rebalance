@@ -5,6 +5,7 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { useTable } from 'react-table';
+import './Table.css';
 
 // See https://react-table.tanstack.com/ for react-table documentation
 // and https://github.com/tannerlinsley/react-table/blob/master/examples/editable-data/src/App.js for an editable table
@@ -113,7 +114,7 @@ function TableConfigurable({ data, columns, edit, onUpdate }) {
 
     return (
         <div>
-            <table {...getTableProps()}>
+            <table className="pure-table pure-table-bordered" {...getTableProps()}>
                 <thead>
                     {// Loop over the header rows
                         headerGroups.map(headerGroup => (
@@ -139,11 +140,6 @@ function TableConfigurable({ data, columns, edit, onUpdate }) {
                                     return (
                                         <td
                                             {...cell.getCellProps()}
-                                            style={{
-                                                padding: '10px',
-                                                border: 'solid 1px gray',
-                                                background: 'papayawhip',
-                                            }}
                                         >
                                             {cell.render('Cell')}
                                         </td>
@@ -156,7 +152,7 @@ function TableConfigurable({ data, columns, edit, onUpdate }) {
                 </tbody>
             </table>
             {
-                edit ? <button onClick={handleAddNewRow}>Add New Row</button> : null
+                edit ? <button className="pure-button" onClick={handleAddNewRow}>Add New Row</button> : null
             }
 
         </div>

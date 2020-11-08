@@ -15,6 +15,25 @@
 
 import React, { useEffect, useState } from 'react';
 import { TableConfigurable } from "./Table"
+import './Page.css';
+
+const Directions = ({state}) => {
+    if(state === "regular") {
+        return(
+            <p>
+                Click the Edit button to add, delete, or change holdings.
+            </p>
+        )
+    } else {
+        return(
+            <p>
+                Click Cancel or Save to undo or save any changes you've made.
+                To edit a cell, just click the cell and change it.
+                To delete a row, use the "Delete Row" button.
+            </p>
+        )
+    }
+}
 
 const Page = ({ backend }) => {
 
@@ -157,6 +176,7 @@ const Page = ({ backend }) => {
     if (portfolio === null) return "Loading...";
     return (
         <div>
+            <Directions state={pageState}/>
             <TableConfigurable
                 data={tableFrom({ portfolio, prices })}
                 columns={columns}
@@ -177,14 +197,16 @@ const Page = ({ backend }) => {
 const PageStateButtons = ({ state, onEditClick, onCancelClick, onSaveClick }) => {
     if (state === "regular") {
         return (
-            <button onClick={onEditClick}>Edit</button>
+            <div className="controls">
+                <button className="pure-button pure-button-primary" onClick={onEditClick}>Edit</button>
+            </div>
         )
     }
     if (state === "editing") {
         return (
-            <div>
-                <button onClick={onCancelClick}>Cancel</button>
-                <button onClick={onSaveClick}>Save</button>
+            <div className="controls">
+                <button className="pure-button" onClick={onCancelClick}>Cancel</button>
+                <button className="pure-button pure-button-primary" onClick={onSaveClick}>Save</button>
             </div>
         )
     }
