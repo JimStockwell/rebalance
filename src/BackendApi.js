@@ -1,9 +1,13 @@
+/* eslint-disable import/first */
 //
 // Wrapper for backend API
 // (Includes a null version constructor)
 //
 // BackendApi: Getting things from the backend and presenting it in a convenient way.
 //
+
+// needed to fix amplify signin
+global.crypto = require('crypto');
 import Amplify, { Auth, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
 
@@ -58,7 +62,8 @@ export default class BackendApi {
         try {
             await this._auth.signIn(username, password);
         } catch (error) {
-            console.log('error signing in', error);
+            console.log('Error signing in.');
+            console.log(error);
         }
     }
 
