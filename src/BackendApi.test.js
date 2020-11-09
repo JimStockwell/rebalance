@@ -1,6 +1,3 @@
-// needed to fix amplify signin
-global.crypto = require('crypto');
-// eslint-disable-next-line import/first
 import BackendApi from './BackendApi';
 
 test('setPortfolio reports okay', () => {

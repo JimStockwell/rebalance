@@ -7,7 +7,7 @@
 //
 
 // needed to fix amplify signin
-global.crypto = require('crypto');
+//global.crypto = require('crypto');
 import Amplify, { Auth, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
 
