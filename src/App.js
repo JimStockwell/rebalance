@@ -53,15 +53,16 @@ function AppBase() {
     <div>
       <Header/>
       <p>Welcome to Financial Portfolio Rebalancer.
+      </p><p>
         I had a problem.
         I wanted my savings portfolio to hold certain percentages of various index funds,
         but as prices changed,
         my actual percentages deviated away from my target percentages.
-        This resulted in more calculator (or spreadsheet) work than I wanted.
+        Periodically correcting this resulted in more calculator (or spreadsheet) work than I wanted.
       </p><p>
         This portfolio rebalancer is my solution.
         It looks up prices (using finnhub.io)
-        and calculates how much of a given index I need to buy or sell
+        and calculates how much of a given index needs to be bought or sold
         to bring the portfolio back to the targeted balance.
       </p><p>
         <ul>
