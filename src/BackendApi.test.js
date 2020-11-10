@@ -1,5 +1,7 @@
 import BackendApi from './BackendApi';
 
+// - set, get, and delete Portfolio
+
 test('setPortfolio reports okay', () => {
     // Arrange...
     const backendApi = BackendApi.create();
@@ -24,7 +26,7 @@ test('factory really returns something', () => {
 const writeAndReadBack = async (backendApi, testValue) => {
 
     return (
-        backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
+        await backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
 
             // Act...
             .then(() => {
@@ -51,6 +53,27 @@ test('backend recalls same value stored, new non-hard coded value', () => {
     const testValue = [{ ticker: "SPX", qty: 600, pct: 100 }];
     return (writeAndReadBack(BackendApi.create(), testValue));
 });
+
+test('deleting the portfolio works', async () => {
+    const backendApi = BackendApi.create();
+    const testValue = [{ ticker: "SPX", qty: 600, pct: 100 }];
+    await backendApi.signIn(process.env.TEST_USERNAME, process.env.TEST_PASSWORD)
+    .then(() => {
+        return backendApi.setPortfolio(testValue);
+    })
+    .then(() => {
+        return backendApi.deletePortfolio();
+    })
+    .then(() => {
+        return backendApi.getPortfolio();
+    })
+
+    // Assert...
+    .then((portfolio) => {
+        expect(portfolio).toEqual([]);
+    })
+
+})
 
 // --------------------------- Nullable setPortfolio and getPortfolio ----------------------
 

@@ -58,6 +58,10 @@ export default class BackendApi {
         // No error catching here, so we propigate out errors
     }
 
+    async deletePortfolio() {
+        return this._api.del(apiName, portfolioPath, {});
+    }
+
     async signIn(username, password) {
         try {
             await this._auth.signIn(username, password);

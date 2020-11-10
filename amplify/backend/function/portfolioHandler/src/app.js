@@ -95,41 +95,26 @@ app.put(path, function(req, res) {
 * HTTP remove method to delete object *
 ***************************************/
 
-// app.delete(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
-//   var params = {};
-//   if (userIdPresent && req.apiGateway) {
-//     params[partitionKeyName] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-//   } else {
-//     params[partitionKeyName] = req.params[partitionKeyName];
-//      try {
-//       params[partitionKeyName] = convertUrlType(req.params[partitionKeyName], partitionKeyType);
-//     } catch(err) {
-//       res.statusCode = 500;
-//       res.json({error: 'Wrong column type ' + err});
-//     }
-//   }
-//   if (hasSortKey) {
-//     try {
-//       params[sortKeyName] = convertUrlType(req.params[sortKeyName], sortKeyType);
-//     } catch(err) {
-//       res.statusCode = 500;
-//       res.json({error: 'Wrong column type ' + err});
-//     }
-//   }
+app.delete(path, function(req, res) {
 
-//   let removeItemParams = {
-//     TableName: tableName,
-//     Key: params
-//   }
-//   dynamodb.delete(removeItemParams, (err, data)=> {
-//     if(err) {
-//       res.statusCode = 500;
-//       res.json({error: err, url: req.url});
-//     } else {
-//       res.json({url: req.url, data: data});
-//     }
-//   });
-// });
+  let removeItemParams = {
+    TableName: tableName,
+    Key: {
+      user: req.apiGateway.event.requestContext.identity.cognitoIdentityId,
+    }
+  }
+  dynamodb.delete(removeItemParams, (err, data)=> {
+    if(err) {
+      res.statusCode = 500;
+      console.log('delete unsuccessful');
+      console.log(err);
+      res.json({error: err, url: req.url});
+    } else {
+      console.log('delete successful')
+      res.json({url: req.url, data: data});
+    }
+  });
+});
 
 app.listen(3000, function() {
     console.log("App started")
