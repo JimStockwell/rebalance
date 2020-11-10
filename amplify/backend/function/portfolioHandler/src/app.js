@@ -60,7 +60,11 @@ app.get(path, function(req, res) {
       res.json({error: 'Error: ' + err.message});
     } else {
       res.set('Content-Type','application/json');
-      res.send(data.Item.portfolio);
+      if(data.Item===undefined) {
+        res.send([]);
+      } else {
+        res.send(data.Item.portfolio);
+      }
     }
   });
 });
